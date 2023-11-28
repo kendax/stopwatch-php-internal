@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Stopwatch</title>
+        <link rel="shortcut icon" href="assets/stopwatch.png" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="flex flex-col h-screen justify-between">
+        <div class="text-right pr-9 pt-4">
+            <p class="text-xl text-sky-600">Stopwatch</p>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center">
+            <h1 id="display" class="text-6xl md:text-6xl lg:text-7xl xl:text-8xl text-center">00:00.00</h1>
+        </div>
+
+        <div class="flex justify-center pb-16">
+            <div class="mr-[8%]">
+                <button class="py-2 px-4 rounded" id="resetbtn"><i class="fa-solid fa-rotate-left fa-lg" style="color: #0284c7;"></i></button>
+            </div>
+            <div class="mr-[15%]">
+                <div>
+                    <button class="py-2 px-4 rounded" id="startStopButton"><i id="icon" class="fa-solid fa-play fa-2xl" style="color: #0284c7;"></i></button>
+                </div>
+            </div>
+        </div>
+        <script>
+            let counterRunning = false;
+            let counterInterval;
+    
+            // Function to toggle the start or stop of the stopwatch
+            $('#startStopButton').on('click', function() {
+                if (!counterRunning) {
+                    startCounter();
+
+                    //replace the play icon with the pause icon
+                    const iconContainer = document.getElementById('startStopButton');
+                    const newIcon = document.createElement('i');
+                    newIcon.setAttribute("id", "icon");
+                    newIcon.classList.add('fa-solid', 'fa-pause', 'fa-2xl');
+                    newIcon.style.color = '#0284c7';
+                    const existingIcon = document.getElementById('icon');
+                    iconContainer.replaceChild(newIcon, existingIcon);
+                } else {
+                    pauseCounter();
+
+                    //replace the pause icon with the play icon
+                    const iconContainer = document.getElementById('startStopButton');
+                    const newIcon = document.createElement('i');
+                    newIcon.setAttribute("id", "icon");
+                    newIcon.classList.add('fa-solid', 'fa-play', 'fa-2xl');
+                    newIcon.style.color = '#0284c7';
+                    const existingIcon = document.getElementById('icon');
+                    iconContainer.replaceChild(newIcon, existingIcon);
+                }
+            });
+
+            // Function to set the stopwatch centisecond increment interval
+            function startCounter() {
+                counterRunning = true;
+                counterInterval = setInterval(updateCounter, 10);
+            }
+
+            // Function to reset the stopwatch centisecond increment interval
+            function pauseCounter() {
+                counterRunning = false;
+                clearInterval(counterInterval);
+            }
+
+             // Function to call the toggler for resetting the stopwatch
+            $('#resetbtn').on('click', function() {
+                resetCounter();
+            });
+
+            // Function to toggle the resetting of the stopwatch
+            function resetCounter() {
+                $.ajax({
+                    url: 'reset.php', // PHP script to reset the counter
+                    success: function() {
+                        // On successful reset, update the counter value on the page
+                        $('#display').text(data);
+                    }
+                });
+            }
+
+            // Function to toggle the starting of the stopwatch counter in the server
+            function updateCounter() {
+                $.ajax({
+                    url: 'index.php', // PHP script to increment the counter
+                    success: function(data) {
+                        // On successful update, update the counter value on the page
+                        $('#display').text(data);
+                    }
+                });
+            }
+
+            // Function to read the stopwatch values from the server asynchronously
+            function readCounter() {
+                $.ajax({
+                    url: 'read.php', // PHP script to read the counter
+                    success: function(data) {
+                        // Display the counter value asynchronously
+                        console.log('Counter value:', data);
+                    }
+                });
+            }
+        </script>
+    </body>
+    </html>
